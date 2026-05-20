@@ -3,12 +3,27 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rtfm"
-version = "0.1.0"
-description = "Structural + semantic code intelligence"
+name = "rtfm-code"
+version = "1.0.0"
+description = "Structural and semantic code intelligence for AI agents"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
+authors = [
+    {name = "jrgs-cloud"},
+]
+keywords = ["code-intelligence", "static-analysis", "graph", "semantic-search", "blast-radius"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+]
 dependencies = [
     "click>=8.1",
     "networkx>=3.3",
@@ -46,6 +61,11 @@ dev = [
     "tree-sitter-python>=0.21",
     "tree-sitter-typescript>=0.21",
 ]
+
+[project.urls]
+Homepage = "https://github.com/jrgs-cloud/rtfm-code"
+Repository = "https://github.com/jrgs-cloud/rtfm-code"
+Issues = "https://github.com/jrgs-cloud/rtfm-code/issues"
 
 [project.scripts]
 rtfm = "rtfm.cli:main"

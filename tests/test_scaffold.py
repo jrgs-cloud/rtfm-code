@@ -7,7 +7,7 @@ from rtfm.cli import main
 
 
 def test_version() -> None:
-    assert rtfm.__version__ == "0.1.0"
+    assert rtfm.__version__ == "1.0.0"
 
 
 def test_cli_help_exits_zero() -> None:

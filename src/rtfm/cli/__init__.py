@@ -8,6 +8,7 @@ from pathlib import Path
 
 import click
 
+from rtfm import __version__
 from .init import init
 from rtfm.core.scope import get_effective_scope
 
@@ -15,6 +16,7 @@ SKIP_DIRS = {"__pycache__", "node_modules", ".venv", "dist", ".git", ".hg", ".sv
 
 
 @click.group()
+@click.version_option(version=__version__, package_name="rtfm-code")
 @click.option("--state-dir", default="status/", show_default=True, help="State directory for graph artifacts.")
 @click.pass_context
 def main(ctx: click.Context, state_dir: str) -> None:
