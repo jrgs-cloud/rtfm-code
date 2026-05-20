@@ -1,0 +1,16 @@
+# Build artifacts
+status/
+*.pkl
+
+# Vector index
+lance/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# Environment
+.venv/

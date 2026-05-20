@@ -1,0 +1,31 @@
+{
+  "auto_edges": {
+    "SkillNode": [
+      "@mentions:delegates_to:agents",
+      "/commands:triggers:skills",
+      "attr:owner:owns:agents:inbound"
+    ],
+    "AgentNode": [
+      "@mentions:delegates_to:agents",
+      "attr:delegates_to:delegates_to:agents",
+      "attr:skills:owns:skills"
+    ],
+    "RuleNode": [
+      "@mentions:constrains:agents",
+      "paths:tier_governs:modules"
+    ],
+    "EthosNode": [
+      "@mentions:shapes:agents"
+    ],
+    "DocNode": [
+      "paths:governs:modules"
+    ],
+    "MemoryNode": [
+      "@mentions:references:agents"
+    ],
+    "ProjectNode": [
+      "@mentions:involves:agents",
+      "/commands:uses:skills"
+    ]
+  }
+}

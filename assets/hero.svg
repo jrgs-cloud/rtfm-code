@@ -1,0 +1,251 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <style>
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    @keyframes scan-ring {
+      0% { opacity: 0.12; }
+      50% { opacity: 0.04; }
+      100% { opacity: 0.12; }
+    }
+    @keyframes danger-pulse {
+      0%, 100% { opacity: 0.85; r: 14; }
+      50% { opacity: 1; r: 16; }
+    }
+    @keyframes edge-flow {
+      0% { stroke-dashoffset: 20; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .cursor { animation: blink 1.1s step-end infinite; }
+    .scan-1 { animation: scan-ring 4s ease-in-out infinite; }
+    .scan-2 { animation: scan-ring 4s ease-in-out 1.3s infinite; }
+    .scan-3 { animation: scan-ring 4s ease-in-out 2.6s infinite; }
+    .danger-node { animation: danger-pulse 2s ease-in-out infinite; }
+    .flow-edge { animation: edge-flow 1.5s linear infinite; }
+  </style>
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#1a202c"/>
+    </linearGradient>
+    <linearGradient id="terminal-bar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2d333b"/>
+      <stop offset="100%" stop-color="#22272e"/>
+    </linearGradient>
+    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#58a6ff"/>
+      <stop offset="50%" stop-color="#bc8cff"/>
+      <stop offset="100%" stop-color="#3fb950"/>
+    </linearGradient>
+    <linearGradient id="node-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#58a6ff"/>
+      <stop offset="100%" stop-color="#2b6cb0"/>
+    </linearGradient>
+    <linearGradient id="node-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bc8cff"/>
+      <stop offset="100%" stop-color="#553c9a"/>
+    </linearGradient>
+    <linearGradient id="node-green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3fb950"/>
+      <stop offset="100%" stop-color="#276749"/>
+    </linearGradient>
+    <linearGradient id="node-danger" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f85149"/>
+      <stop offset="100%" stop-color="#da3633"/>
+    </linearGradient>
+    <filter id="node-shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="danger-glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#f85149" flood-opacity="0.6" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="hub-glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#58a6ff" flood-opacity="0.4" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="title-glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#58a6ff" flood-opacity="0.35" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrowhead" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#8b949e" opacity="0.8"/>
+    </marker>
+    <marker id="arrow-danger" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#f85149" opacity="0.7"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bg-grad)"/>
+
+  <!-- Concentric scan rings (radar feel) centered on graph hub -->
+  <g transform="translate(820, 185)">
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#58a6ff" stroke-width="0.5" class="scan-1"/>
+    <circle cx="0" cy="0" r="110" fill="none" stroke="#58a6ff" stroke-width="0.4" class="scan-2"/>
+    <circle cx="0" cy="0" r="160" fill="none" stroke="#58a6ff" stroke-width="0.3" class="scan-3"/>
+  </g>
+
+  <!-- PCB trace background pattern (subtle) -->
+  <g stroke="#30363d" stroke-width="0.6" fill="none" opacity="0.3">
+    <path d="M0,80 H120 L140,100 H200"/>
+    <path d="M0,160 H80 L100,140 H160 L180,160 H240"/>
+    <path d="M0,320 H60 L80,300 H140"/>
+    <path d="M1200,120 H1080 L1060,140 H1000"/>
+    <path d="M1200,280 H1100 L1080,260 H1020 L1000,280 H960"/>
+    <path d="M1200,360 H1140 L1120,340 H1060"/>
+    <!-- Vertical traces -->
+    <path d="M200,0 V60 L220,80 V120"/>
+    <path d="M1000,400 V340 L980,320 V280"/>
+    <path d="M160,400 V360 L180,340 V300"/>
+    <path d="M1040,0 V40 L1060,60 V100"/>
+  </g>
+
+  <!-- Terminal window frame -->
+  <g transform="translate(60, 40)">
+    <!-- Terminal chrome -->
+    <rect x="0" y="0" width="420" height="280" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+    <!-- Title bar -->
+    <rect x="0" y="0" width="420" height="32" rx="8" fill="url(#terminal-bar)"/>
+    <rect x="0" y="24" width="420" height="8" fill="url(#terminal-bar)"/>
+    <!-- Traffic lights -->
+    <circle cx="18" cy="16" r="5.5" fill="#f85149" opacity="0.8"/>
+    <circle cx="36" cy="16" r="5.5" fill="#e3b341" opacity="0.8"/>
+    <circle cx="54" cy="16" r="5.5" fill="#3fb950" opacity="0.8"/>
+    <!-- Title text -->
+    <text x="210" y="20" text-anchor="middle" font-family="'Inter', 'SF Pro', -apple-system, sans-serif" font-size="11" fill="#8b949e">rtfm -- code intelligence</text>
+
+    <!-- Terminal content -->
+    <g font-family="'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace" font-size="13">
+      <!-- Line 1: prompt + command -->
+      <text x="16" y="58" fill="#8b949e">$</text>
+      <text x="30" y="58" fill="#3fb950">rtfm</text>
+      <text x="72" y="58" fill="#e6edf3"> gate src/handler.py</text>
+      <!-- Line 2: output -->
+      <text x="16" y="82" fill="#8b949e">analyzing dependencies...</text>
+      <!-- Line 3: result -->
+      <text x="16" y="110" fill="#e3b341">WARNING</text>
+      <text x="90" y="110" fill="#8b949e">blast radius: 7 files</text>
+      <!-- Line 4 -->
+      <text x="16" y="134" fill="#8b949e">locked: src/app.py (transitive)</text>
+      <!-- Line 5 -->
+      <text x="16" y="158" fill="#f85149">GATE:</text>
+      <text x="62" y="158" fill="#8b949e"> proceed with caution</text>
+      <!-- Blank line -->
+      <!-- Line 6: new prompt -->
+      <text x="16" y="194" fill="#8b949e">$</text>
+      <text x="30" y="194" fill="#3fb950">rtfm</text>
+      <text x="72" y="194" fill="#e6edf3"> impact --depth 2</text>
+      <!-- Line 7: output -->
+      <text x="16" y="218" fill="#58a6ff">primary:</text>
+      <text x="85" y="218" fill="#8b949e">handler.py, memory.py, tools.py</text>
+      <!-- Line 8 -->
+      <text x="16" y="242" fill="#bc8cff">secondary:</text>
+      <text x="105" y="242" fill="#8b949e">app.py, config.py</text>
+      <!-- Line 9: new prompt with cursor -->
+      <text x="16" y="270" fill="#8b949e">$</text>
+      <rect x="28" y="258" width="8" height="16" fill="#e6edf3" class="cursor"/>
+    </g>
+  </g>
+
+  <!-- Graph visualization (right side) -->
+  <g transform="translate(560, 20)">
+    <!-- Directed edges -->
+    <g fill="none" stroke-width="2" marker-end="url(#arrowhead)">
+      <!-- Hub outbound -->
+      <line x1="260" y1="165" x2="340" y2="95" stroke="#58a6ff" opacity="0.6"/>
+      <line x1="260" y1="165" x2="170" y2="85" stroke="#bc8cff" opacity="0.6"/>
+      <line x1="260" y1="165" x2="160" y2="230" stroke="#3fb950" opacity="0.6"/>
+      <line x1="260" y1="165" x2="360" y2="240" stroke="#58a6ff" opacity="0.6"/>
+      <!-- Secondary edges -->
+      <line x1="340" y1="90" x2="430" y2="55" stroke="#8b949e" opacity="0.35"/>
+      <line x1="170" y1="80" x2="100" y2="45" stroke="#8b949e" opacity="0.35"/>
+      <line x1="160" y1="235" x2="90" y2="280" stroke="#8b949e" opacity="0.35"/>
+      <line x1="360" y1="245" x2="440" y2="285" stroke="#8b949e" opacity="0.35"/>
+      <!-- Cross edges -->
+      <line x1="340" y1="90" x2="430" y2="140" stroke="#8b949e" opacity="0.25"/>
+      <line x1="170" y1="80" x2="100" y2="130" stroke="#8b949e" opacity="0.25"/>
+    </g>
+
+    <!-- Danger edge (animated dash) -->
+    <line x1="260" y1="175" x2="310" y2="310" stroke="#f85149" stroke-width="2" stroke-dasharray="6,4" opacity="0.7" class="flow-edge" marker-end="url(#arrow-danger)"/>
+
+    <!-- Tertiary nodes (small, far) -->
+    <circle cx="430" cy="50" r="7" fill="#2b6cb0" opacity="0.5" filter="url(#node-shadow)"/>
+    <circle cx="100" cy="40" r="6" fill="#553c9a" opacity="0.5" filter="url(#node-shadow)"/>
+    <circle cx="90" cy="280" r="6" fill="#276749" opacity="0.5" filter="url(#node-shadow)"/>
+    <circle cx="440" cy="285" r="7" fill="#2b6cb0" opacity="0.5" filter="url(#node-shadow)"/>
+    <circle cx="430" cy="140" r="5" fill="#553c9a" opacity="0.4" filter="url(#node-shadow)"/>
+    <circle cx="100" cy="130" r="5" fill="#276749" opacity="0.4" filter="url(#node-shadow)"/>
+
+    <!-- Primary nodes (larger, brighter) -->
+    <circle cx="340" cy="88" r="12" fill="url(#node-blue)" filter="url(#node-shadow)"/>
+    <circle cx="170" cy="78" r="11" fill="url(#node-purple)" filter="url(#node-shadow)"/>
+    <circle cx="160" cy="235" r="11" fill="url(#node-green)" filter="url(#node-shadow)"/>
+    <circle cx="360" cy="245" r="12" fill="url(#node-blue)" filter="url(#node-shadow)"/>
+
+    <!-- Danger node (gate blocked) -->
+    <circle cx="310" cy="315" r="14" fill="url(#node-danger)" class="danger-node" filter="url(#danger-glow)"/>
+    <line x1="303" y1="308" x2="317" y2="322" stroke="#0d1117" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="317" y1="308" x2="303" y2="322" stroke="#0d1117" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Central hub node -->
+    <circle cx="260" cy="165" r="18" fill="url(#node-blue)" filter="url(#hub-glow)"/>
+    <circle cx="260" cy="165" r="8" fill="#0d1117" opacity="0.5"/>
+    <circle cx="260" cy="165" r="3.5" fill="#e6edf3" opacity="0.9"/>
+
+    <!-- Node labels -->
+    <g font-family="'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace" font-size="9" fill="#8b949e">
+      <text x="260" y="195" text-anchor="middle">handler.py</text>
+      <text x="340" y="112" text-anchor="middle">memory.py</text>
+      <text x="170" y="102" text-anchor="middle">tools.py</text>
+      <text x="160" y="258" text-anchor="middle">config.py</text>
+      <text x="360" y="268" text-anchor="middle">utils.py</text>
+      <text x="310" y="340" text-anchor="middle" fill="#f85149" font-size="10">app.py</text>
+      <text x="310" y="353" text-anchor="middle" fill="#f85149" font-size="8">LOCKED</text>
+    </g>
+  </g>
+
+  <!-- Feature pills bar -->
+  <rect x="0" y="348" width="1200" height="52" fill="#0d1117" opacity="0.85"/>
+  <line x1="0" y1="348" x2="1200" y2="348" stroke="url(#accent-grad)" stroke-width="1" opacity="0.5"/>
+
+  <g font-family="'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace" font-size="11.5" transform="translate(0, 356)">
+    <rect x="180" y="4" width="110" height="26" rx="13" fill="#2b6cb0" fill-opacity="0.15" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="235" y="21" text-anchor="middle" fill="#58a6ff">blast radius</text>
+
+    <rect x="306" y="4" width="60" height="26" rx="13" fill="#da3633" fill-opacity="0.12" stroke="#f85149" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="336" y="21" text-anchor="middle" fill="#f85149">gate</text>
+
+    <rect x="382" y="4" width="138" height="26" rx="13" fill="#553c9a" fill-opacity="0.12" stroke="#bc8cff" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="451" y="21" text-anchor="middle" fill="#bc8cff">semantic search</text>
+
+    <rect x="536" y="4" width="104" height="26" rx="13" fill="#2b6cb0" fill-opacity="0.12" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="588" y="21" text-anchor="middle" fill="#58a6ff">hybrid RRF</text>
+
+    <rect x="656" y="4" width="88" height="26" rx="13" fill="#276749" fill-opacity="0.12" stroke="#3fb950" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="700" y="21" text-anchor="middle" fill="#3fb950">obsidian</text>
+
+    <rect x="760" y="4" width="100" height="26" rx="13" fill="#553c9a" fill-opacity="0.08" stroke="#bc8cff" stroke-width="0.6" stroke-opacity="0.35"/>
+    <text x="810" y="21" text-anchor="middle" fill="#bc8cff" opacity="0.7">local-first</text>
+
+    <rect x="876" y="4" width="108" height="26" rx="13" fill="#276749" fill-opacity="0.08" stroke="#3fb950" stroke-width="0.6" stroke-opacity="0.35"/>
+    <text x="930" y="21" text-anchor="middle" fill="#3fb950" opacity="0.7">pure Python</text>
+  </g>
+</svg>

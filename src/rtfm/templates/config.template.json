@@ -1,0 +1,40 @@
+{
+  "paths": {
+    "graph": "status/rtfm-graph.json",
+    "pickle": "status/graph.pkl",
+    "index": "status/lance/"
+  },
+  "gate": {
+    "warning_threshold": 5,
+    "block_on_locked_deps": true,
+    "locked_files": [],
+    "impact_depth": 2
+  },
+  "enrich": {
+    "default_scope": "src/",
+    "skip_dirs": ["node_modules", ".venv", "__pycache__", "dist"],
+    "file_timeout_seconds": 10
+  },
+  "languages": ["python", "typescript"],
+  "extractors": ["code", "config", "doc"],
+  "targets": ["."],
+  "skip_dirs": [],
+  "domains": {
+    "_comment": "Map folder patterns to domain node types. Supports short form (glob) or full spec.",
+    "skills": {
+      "match": "*/SKILL.md",
+      "node_type": "SkillNode",
+      "extractor": "domain"
+    },
+    "agents": {
+      "match": "*.md",
+      "node_type": "AgentNode",
+      "extractor": "domain"
+    },
+    "rules": {
+      "match": "*.md",
+      "node_type": "RuleNode",
+      "extractor": "domain"
+    }
+  }
+}
