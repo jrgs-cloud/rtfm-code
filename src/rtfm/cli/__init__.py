@@ -946,6 +946,125 @@ def watch(ctx: click.Context, path: str, enrich: bool) -> None:
     ))
 
 
+@main.command()
+@click.argument("files", nargs=-1, type=click.Path())
+@click.option("--since", default=None, help="Git ref to diff against (default: last graph commit)")
+@click.option("--fallback-threshold", default=50, help="Fall back to full rebuild above this many files")
+@click.option("--commit", is_flag=True, default=False, help="Auto-commit status/ after update")
+@click.option("--structural-only", is_flag=True, default=False, help="Skip enrichment (fast structural-only path)")
+@click.pass_context
+def update(ctx, files, since, fallback_threshold, commit, structural_only):
+    """Incremental graph update for changed files."""
+    import subprocess
+
+    state_dir = Path(ctx.obj["state_dir"])
+    root = Path(".").resolve()
+
+    # Skip if watcher is active (it handles updates in real-time)
+    from rtfm.core.watcher import is_watcher_active
+    watcher_pid = is_watcher_active(state_dir)
+    if watcher_pid:
+        click.echo(json.dumps({
+            "mode": "skipped",
+            "reason": f"watcher active (pid: {watcher_pid})",
+            "files_changed": 0,
+        }))
+        return
+
+    # Resolve the set of changed files from args, --since, or last graph commit
+    changed: list[str] = []
+
+    if files:
+        changed = list(files)
+    elif since is not None:
+        try:
+            proc = subprocess.run(
+                ["git", "diff", "--name-only", f"{since}..HEAD"],
+                capture_output=True, text=True, check=True,
+            )
+            changed = [f for f in proc.stdout.splitlines() if f.strip()]
+        except subprocess.CalledProcessError as e:
+            click.echo(json.dumps({"error": "git_diff_failed", "message": e.stderr.strip()}), err=True)
+            sys.exit(1)
+    else:
+        # Auto-detect: diff since the last commit that touched the graph file
+        graph_file = state_dir / "rtfm-graph.json"
+        try:
+            proc = subprocess.run(
+                ["git", "log", "-1", "--format=%H", "--", str(graph_file)],
+                capture_output=True, text=True, check=True,
+            )
+            last_commit = proc.stdout.strip()
+        except subprocess.CalledProcessError as e:
+            click.echo(json.dumps({"error": "git_log_failed", "message": e.stderr.strip()}), err=True)
+            sys.exit(1)
+
+        if not last_commit:
+            click.echo(
+                json.dumps({
+                    "error": "no_graph_commit",
+                    "message": "No git history found for graph file. Provide files or --since.",
+                }),
+                err=True,
+            )
+            sys.exit(1)
+
+        try:
+            proc = subprocess.run(
+                ["git", "diff", "--name-only", f"{last_commit}..HEAD"],
+                capture_output=True, text=True, check=True,
+            )
+            changed = [f for f in proc.stdout.splitlines() if f.strip()]
+        except subprocess.CalledProcessError as e:
+            click.echo(json.dumps({"error": "git_diff_failed", "message": e.stderr.strip()}), err=True)
+            sys.exit(1)
+
+    if len(changed) > fallback_threshold:
+        click.echo(
+            f"[update] {len(changed)} files changed (>{fallback_threshold}), falling back to full rebuild",
+            err=True,
+        )
+        ctx.invoke(build_all, path=str(root))
+        return
+
+    # Incremental path
+    changed_paths = [Path(f) for f in changed]
+
+    try:
+        from rtfm.core.incremental import update_graph as _update_graph
+    except ImportError as e:
+        click.echo(json.dumps({"error": "incremental_unavailable", "message": str(e)}), err=True)
+        sys.exit(1)
+
+    try:
+        stats = _update_graph(changed_paths, root, state_dir, skip_enrich=structural_only)
+    except FileNotFoundError as e:
+        click.echo(json.dumps({"error": "graph_not_found", "message": str(e)}), err=True)
+        sys.exit(1)
+
+    # Auto-commit if requested
+    committed = False
+    if commit and stats["nodes_added"] + stats["nodes_removed"] + stats.get("enrich_edges", 0) > 0:
+        try:
+            subprocess.run(["git", "add", str(state_dir)], check=True, capture_output=True)
+            msg = f"guru: graph update ({len(changed)} files, +{stats['nodes_added']}/-{stats['nodes_removed']} nodes)"
+            subprocess.run(["git", "commit", "-m", msg], check=True, capture_output=True)
+            committed = True
+        except subprocess.CalledProcessError:
+            committed = False
+
+    click.echo(json.dumps({
+        "files_changed": len(changed),
+        "nodes_added": stats["nodes_added"],
+        "nodes_removed": stats["nodes_removed"],
+        "edges_delta": stats["edges_delta"],
+        "enrich_edges": stats.get("enrich_edges", 0),
+        "mode": "incremental",
+        "structural_only": structural_only,
+        "committed": committed,
+    }))
+
+
 @main.command("validate")
 @click.option("--coverage-file", required=True, type=click.Path(exists=True), help="Path to coverage data (.coverage or coverage-final.json).")
 @click.option("--project-root", default=".", type=click.Path(exists=True), help="Project root for path relativization.")

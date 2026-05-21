@@ -148,11 +148,12 @@ def update_graph(
     root: Path,
     state_dir: Path,
     config: dict | None = None,
+    skip_enrich: bool = False,
 ) -> dict[str, int]:
     """Incrementally update the graph for changed files.
 
     Always re-enriches changed files + dependents to keep type-resolved
-    edges consistent. A graph with stale edges is worse than a slightly
+    edges consistent, unless skip_enrich=True (structural-only fast path).
     slower update.
 
     Returns dict with keys: nodes_added, nodes_removed, edges_delta, enrich_edges.
@@ -240,20 +241,21 @@ def update_graph(
 
         # Re-enrich changed files + dependents (keeps type-resolved edges consistent)
         enrich_stats = {"edges_found": 0}
-        existing_files = [fp for fp in changed_files if fp.exists()]
-        if existing_files:
-            try:
-                from .jedi_enricher import enrich_incremental
-                enrich_stats = enrich_incremental(
-                    project_root=root,
-                    graph_path=json_path,
-                    changed_files=existing_files,
-                    merge=True,
-                    verbose=False,
-                    config=config,
-                )
-            except (ImportError, RuntimeError) as e:
-                logger.debug("Enrichment skipped: %s", e)
+        if not skip_enrich:
+            existing_files = [fp for fp in changed_files if fp.exists()]
+            if existing_files:
+                try:
+                    from .jedi_enricher import enrich_incremental
+                    enrich_stats = enrich_incremental(
+                        project_root=root,
+                        graph_path=json_path,
+                        changed_files=existing_files,
+                        merge=True,
+                        verbose=False,
+                        config=config,
+                    )
+                except (ImportError, RuntimeError) as e:
+                    logger.debug("Enrichment skipped: %s", e)
 
         # Mark semantic index dirty
         _mark_semantic_dirty(state_dir, list(rel_paths))

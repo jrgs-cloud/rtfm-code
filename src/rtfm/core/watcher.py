@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import sys
 import time
 from pathlib import Path
@@ -17,6 +18,29 @@ SKIP_EXTENSIONS = {".pyc", ".pyo", ".so", ".o", ".a", ".class", ".jar"}
 SOURCE_EXTENSIONS = {".py", ".ts", ".tsx", ".js", ".jsx", ".json", ".yaml", ".yml", ".toml", ".md"}
 
 DEBOUNCE_MS = 500
+PID_FILENAME = ".rtfm-watcher.pid"
+
+
+def is_watcher_active(state_dir: Path) -> int | None:
+    """Check if a watcher is active. Returns PID if alive, None otherwise.
+
+    Cleans up stale PID files automatically.
+    """
+    pid_file = state_dir / PID_FILENAME
+    if not pid_file.exists():
+        return None
+
+    try:
+        pid = int(pid_file.read_text().strip())
+        os.kill(pid, 0)  # Check if process is alive
+        return pid
+    except (ValueError, ProcessLookupError, PermissionError):
+        # Stale PID file — clean up
+        try:
+            pid_file.unlink()
+        except OSError:
+            pass
+        return None
 
 
 def _should_skip(path: Path) -> bool:
@@ -251,6 +275,11 @@ async def watch_loop(
     enrich_tasks: set[asyncio.Task] = set()
     index_tasks: set[asyncio.Task] = set()
 
+    # Write PID file so rtfm update knows to skip
+    pid_file = state_dir / PID_FILENAME
+    pid_file.parent.mkdir(parents=True, exist_ok=True)
+    pid_file.write_text(str(os.getpid()))
+
     # Warm Jedi Project cache: persistent instance reuses inference cache across cycles
     _jedi_project = None
     _enrich_cycle_count = 0
@@ -351,4 +380,9 @@ async def watch_loop(
             task.cancel()
         if all_tasks:
             await asyncio.gather(*all_tasks, return_exceptions=True)
+        # Remove PID file
+        try:
+            pid_file.unlink()
+        except OSError:
+            pass
         _emit_event({"event": "stopped"})
